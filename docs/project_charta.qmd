@@ -1,4 +1,4 @@
-# Project Charta oder die grosse Sonne des Mondes
+# Project Charta
 ## Context and Scope
 Describe the context (domain/business area) and topic of the visualization project. Which topical aspects should be addressed? Which question(s) should the data visualization project answer? What are the expected benefits of the project? Where should the visualization product be published (e.g. website, app, intranet)?
 
