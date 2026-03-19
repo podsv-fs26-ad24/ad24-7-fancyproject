@@ -55,7 +55,58 @@ Out of Scope
     Automated Enforcement: The tool provides recommendations and status alerts but does not physically block external booking transactions. 
 
 ## Stakeholder Analysis
-List the people involved in and affected by the project. Describe their goals and relationships with each other. Visualisation in the form of a stakeholder map can provide a quick overview.
+Sustainability Manager  
+
+Motto: ‘Numbers don’t lie, neither does our planet’ 
+
+Role: Responsible for company-wide monitoring of Co2 emissions and achieving sustainability goals. This role operates across departments and does not focus on a single department but rather considers the entire company. The sustainability manager prepares reports for senior management and communicates progress to external stakeholders such as investors or regulatory agencies.  
+
+Goal: Monitor corporate travel emissions, identify savings, and track progress against the Co2 budget.  
+
+Dashboard interest: Very High. As the primary user, they need to answer one question at any given moment: are we within budget, and if not, why? This tool replaces manual evaluations and is critical for their sustainability reporting. 
+
+ 
+
+ 
+
+ 
+
+Travel Mangager  
+
+Motto: ‘Every trip planned, every policy enforced’ 
+
+Role: Responsible for the operational coordination of all business travel within the company. The Travel Manager manages framework agreements with airlines, hotels, and rail carriers, and approves or denies travel requests. They are the first to notice when travel patterns get out of hand and act before they escalate, whether in terms of costs or emission. 
+
+Goal: Oversee all trip requests/approvals, identify policy violations, and actively promote sustainable travel alternatives. 
+
+Dashboard interest: Very high. This is a daily operational tool used to filter by transport mode, destination and department. The transport mode comparison is a core feature for this role. Spotting trips where a alternative connection was available, but a flight was booked anyway is exactly the policy violation the Travel Manger needs to act on. 
+
+ 
+
+ 
+
+Finance / Controlling  
+
+Motto: ‘No budget, no ticket’ 
+
+Role: Responsible for monitoring all travel-related expenses and ensuring that budgets are adhered to across the company. The Finance team tracks spending across all departments and must flag deviations early before they become a budget problem. As business travel can represent a significant cost factor, they need clear visibility into where money is being spent, by whom, and for what purpose. 
+
+Goal: Understand cost distribution by department and travel purpose and ensure that travel expenditures remain within planned budget limits. 
+
+Dashboard interest: Medium. Finance focuses on cost-related KPIs, total spend, cost per trip, cost per department and cost per transport mode. CO₂ data is secondary unless emission-related fees become budget-relevant. The dashboard's value lies in consolidating travel costs in one place, without manual data pulls from separate systems. 
+
+ 
+
+Management / Corporate 
+
+Motto: ‘Big picture, no noise’ 
+
+Role: Senior decision-makers with overall responsibility for the company's strategic direction, including sustainability commitments and cost targets. Management sets the overarching CO₂ reduction goals and travel budget thresholds, and is accountable to external stakeholders such as investors, regulators, or board members. They do not engage with individual trip data or operational details. Their view is exclusively top-down. 
+
+Goal: Get a fast, reliable overview of whether the company is on track to meet its sustainability and cost targets and have a data-driven basis to initiate strategic corrections if needed. 
+
+Dashboard interest: High. Management needs a clean summary view. Current CO₂ budget consumption, overall spend, and trend direction. The transport mode comparison feature is particularly relevant here, as it supports strategic decisions like introducing mandatory rail travel policies below a certain distance threshold. Detailed filters or raw data views are not relevant for this group. They need clear indicators, not analysis tools. 
+
 
 ## User Analysis
 Analyse the target audience of the visualization product and create at least 2 personas with **relevant attributes** such as domain expertise, data literacy, technical environment (devices, screen sizes), frequency of use etc. Amend each persona with the dimensions of the customer profile side in the Value Proposition Canvas @Osterwalder2014:
