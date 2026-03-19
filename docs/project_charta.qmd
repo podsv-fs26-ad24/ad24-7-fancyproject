@@ -153,21 +153,43 @@ Streamlit deployment issues (Low likelihood, Medium impact) — Test deployment 
 
 
 ## Visualization Concept
-Translate the project objectives into a concrete visualization concept. This corresponds to the value map side of the Value Proposition Canvas [@Osterwalder2014] – describe how the proposed visualization product addresses the users' tasks, relieves their pains and creates gains. Address the following aspects:
+Product Form 
+The product will be an interactive dashboard combining CO₂ budget monitoring, modal shift analysis, and a trip evaluation tool. It supports quick assessment and detailed exploration, helping users monitor emissions, identify reduction opportunities, and evaluate travel options. 
 
-* **Product form**: Composition of the visualization product – dashboard, data story, infographic, exploratory tool, etc.
-* **Visual encodings**: Types of charts and visualizations to be used – e.g. bar chart, line chart, scatter plot, map, etc.
-* **Interactivity**: Static vs. dynamic/interactive elements – filtering, drill-down, tooltips, linked views, etc.
-* **Narrative and annotation**: Text elements, storytelling structure, annotations and contextual information.
-* **Target medium and integration**: Embedding in the target environment – e.g. website, intranet, app, print, etc.
+Visual Encodings 
 
-For each design decision, articulate the intended value along three dimensions:
+    Gauge (green, yellow, red): Show CO₂ usage per business unit as traffic light indicators for critical budgets. 
 
-* **Cognitive and analytical value**: How does the design amplify the user's ability to detect patterns, identify outliers, understand distributions or discover relationships [@card1999; @vanwijk2005]?
-* **Communicative value**: How does the design support the communication of information to the target audience profile(s)? 
-* **Experiential and aesthetic value**: How do the visual and interactive qualities of the design foster engagement, trust and willingness to adopt the product in practice?
+    Maps: Compare plane and train routes geographically to illustrate travel paths and distance differences. 
 
-Justify the concept by mapping it explicitly to the project objectives and the user needs identified in the user analysis.
+    Comparison panels beside the map: Display CO₂ emissions, travel hours, cost, and remaining CO₂ budget for each travel option, enabling side-by-side evaluation of plane vs. train. 
+
+    Highlight metrics: Show total CO₂ used, remaining budget, and avoidable CO₂ in a clear, visible format. 
+
+ 
+
+Interactivity 
+Users can filter by business unit and input specific travel routes. The dashboard updates dynamically, with tooltips and linked views to explore route differences and budget impact. 
+
+ 
+
+Narrative and Annotation 
+The layout flows from overview (budget status) → insights (modal shift potential) → action (trip evaluation). Labels, short explanatory texts, and recommendation messages guide interpretation. 
+
+ 
+
+Target Medium and Integration 
+Designed as a web-based dashboard for the company intranet, ensuring accessibility during travel planning and integration into existing workflows. 
+
+ 
+
+Value 
+
+    Cognitive: Highlights patterns, differences, and trade-offs clearly. 
+
+    Communicative: Translates complex travel data into actionable, understandable insights. 
+
+    Experiential: Interactive, visually engaging design encourages trust, clarity, and adoption. 
 
 
 ## Project Plan
