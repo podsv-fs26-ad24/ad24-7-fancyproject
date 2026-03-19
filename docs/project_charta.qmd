@@ -2,7 +2,7 @@
 
 ---
 
-## 1.1 Context and Scope
+## Context and Scope
 
 The Carbon Gatekeeper Dashboard is an interactive tool designed to manage and reduce CO₂ emissions from business travel by linking travel decisions directly to carbon budgets at the department level. Moving beyond retrospective reporting, the dashboard provides real-time, data-driven guidance at the point of planning. The project is designed to answer three core questions:
 
