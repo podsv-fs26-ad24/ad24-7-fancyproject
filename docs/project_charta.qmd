@@ -106,6 +106,8 @@ Analyse the target audience of the visualization product and create at least 2 p
 - **Pains**: What obstacles, risks or undesired outcomes do users currently face? What makes their current approach frustrating or inefficient?
 - **Gains**: What outcomes and benefits do users expect or desire? What would exceed their expectations?
 
+![](pics/persona_daniel_schmid.png){ width=80% }
+
 ---
 
 ## 1.5 Situation Assessment
