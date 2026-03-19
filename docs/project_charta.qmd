@@ -117,7 +117,39 @@ Analyse the target audience of the visualization product and create at least 2 p
 
 
 ## Situation Assessment
-Describe the available resources (data, personnel, material, software/tools, infrastructure, etc.) and time as well as restrictions and constraints. Possible risks that may arise during the project are also identified.
+Available Resources 
+
+Data: The primary data source is a dataset of more than 25,000 business travel records, including attributes such as travel mode, origin and destination, travel purpose, distance, travel cost and CO₂ emissions calculated using the CO2e RFI2.7 methodology. The dataset provides sufficient volume and attribute diversity to support budget monitoring, modal shift analysis and route-level trip evaluation. 
+
+ 
+
+Personnel: The project is carried out by a student team of four members with complementary roles covering project coordination, data analysis and preprocessing, dashboard development and user analysis. All members contribute collaboratively across tasks.  
+
+ 
+
+Tools: 
+    Python 
+    Pandas 
+    Matplotlib / Seaborn 
+    Streamlit / Plotly for interactive dashboard implementation 
+    GitHub repository for reproducibility and version control 
+
+     
+
+Infrastructure: 
+    GitHub repository as the central platform for code, documentation and version control 
+    GitHub Pages or Streamlit Cloud for web-based deployment of the dashboard prototype 
+    Local development environments across all team members 
+
+Constraints 
+    limited project time within the semester schedule 
+    No access to real-time booking systems or external travel APIs. The analysis is limited to the provided static dataset 
+    Reproducibility must be fully ensured vie the GitHub repository, including data processing steps and visualization code 
+
+Risks
+Missing / inconsistent data fields (Medium likelihood, High impact) — Early data audit and cleaning in the preparation phase
+Time limitations for interactive features (High likelihood, Medium impact) — Prioritise core features (budget monitor, train vs. plane) over secondary filters
+Streamlit deployment issues (Low likelihood, Medium impact) — Test deployment early, fall back to local demo if needed
 
 
 ## Visualization Concept
