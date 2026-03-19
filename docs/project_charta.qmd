@@ -18,7 +18,7 @@ The project scope involves developing a functional dashboard prototype that inte
 
 ---
 
-## 1.2 Project Objectives and Success Criteria
+## Project Objectives and Success Criteria
 
 The primary objective of this project is to deliver the "Carbon Gatekeeper" Dashboard, a functional prototype that moves the organization from retrospective reporting to active, point-of-planning travel management.
 
@@ -52,7 +52,7 @@ Specifically, the dashboard enables stakeholders to answer three core questions:
 
 ---
 
-## 1.3 Stakeholder Analysis
+## Stakeholder Analysis
 
 ### Sustainability Manager
 > *"Numbers don't lie, neither does our planet"*
@@ -98,7 +98,7 @@ Specifically, the dashboard enables stakeholders to answer three core questions:
 
 ---
 
-## 1.4 User Analysis
+## User Analysis
 
 The following personas represent key user groups of the dashboard. 
 They were developed based on literature and domain-specific sources to reflect 
@@ -125,7 +125,7 @@ different perspectives on business travel and CO₂ management within the compan
 
 ---
 
-## 1.5 Situation Assessment
+## Situation Assessment
 
 ### Available Resources
 
@@ -165,7 +165,7 @@ The project is carried out by a student team of four members with complementary 
 
 ---
 
-## 1.6 Visualization Concept
+## Visualization Concept
 
 ### Product Form
 
@@ -200,7 +200,7 @@ Designed as a web-based dashboard for the company intranet, ensuring accessibili
 
 ---
 
-## 1.7 Project Plan
+## Project Plan
 
 The project is structured into four main phases: project understanding, data acquisition and exploration, visual encoding and design, and evaluation. The following Gantt chart provides an overview of the planned tasks and milestones.
 
@@ -239,7 +239,7 @@ gantt
 
 ---
 
-## 1.8 Roles and Contact Details
+## Roles and Contact Details
 
 | Name | Role | Tasks | Contact |
 |---|---|---|---|
