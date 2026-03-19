@@ -230,4 +230,22 @@ gantt
 ``` 
 
 ## Roles and Contact Details
-List the people involved in the development work here with their role titles, tasks and contact details.
+Michelle Linares M. 
+Role: Project coordination, visualization design 
+Tasks: Project planning and coordination, development of the visualization concept, dashboard design and documentation 
+Contact: linarmic@students.zhaw.ch 
+
+Domenik Bächler 
+Role: Data analysis and processing 
+Tasks: Data cleaning and preprocessing, exploratory data analysis, calculation of CO₂ metrics and preparation of the data report 
+Contact: baechdom@students.zhaw.ch 
+
+Dario Filippone 
+Role: Dashboard development 
+Tasks: Implementation of the interactive dashboard, integration of visualizations, development of filtering and interaction features 
+Contact: filipda1@students.zhaw.ch 
+
+Ajna Binaki 
+Role: User analysis and evaluation 
+Tasks: Stakeholder and user analysis, definition of personas, evaluation of the visualization and preparation of presentation materials 
+Contact: binakajn@students.zhaw.ch 
