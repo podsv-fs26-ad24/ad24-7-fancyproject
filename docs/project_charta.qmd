@@ -100,13 +100,28 @@ Specifically, the dashboard enables stakeholders to answer three core questions:
 
 ## 1.4 User Analysis
 
-Analyse the target audience of the visualization product and create at least 2 personas with **relevant attributes** such as domain expertise, data literacy, technical environment (devices, screen sizes), frequency of use etc. Amend each persona with the dimensions of the customer profile side in the Value Proposition Canvas @Osterwalder2014:
+The following personas represent key user groups of the dashboard. 
+They were developed based on literature and domain-specific sources to reflect 
+different perspectives on business travel and CO₂ management within the company.
 
-- **User tasks** (jobs): What tasks are users trying to accomplish? Consider functional jobs (e.g. analysing data, making decisions), social jobs (e.g. reporting to stakeholders, collaborating with colleagues) and emotional jobs (e.g. feeling confident in their decisions).
-- **Pains**: What obstacles, risks or undesired outcomes do users currently face? What makes their current approach frustrating or inefficient?
-- **Gains**: What outcomes and benefits do users expect or desire? What would exceed their expectations?
+### Persona 1: Daniel Schmid
+![](pics/persona_daniel_schmid.png){ width=70% }
 
-![](pics/persona_daniel_schmid.png){ width=80% }
+### Persona 2: Anna Meier
+![](pics/persona_anna_meier.png){ width=70% }
+
+### Sources
+
+**Daniel Schmid**
+- https://fis.leuphana.de/de/publications/nachhaltigkeitsmanagement-in-unternehmen-von-der-idee-zur-praxis-/
+- https://www.hs-koblenz.de/fileadmin/media/fb_wirtschaftswissenschaften/Forschung_Projekte/Publikationen/Schriftenreihe_38_Schueller_Mengen.pdf
+- https://ghgprotocol.org/sites/default/files/standards/ghg-protocol-revised.pdf
+- https://www.mckinsey.com/industries/energy-and-materials/our-insights/global-energy-perspective
+
+**Anna Meier**
+- https://www.tourism-review.com/survey-shows-the-preferences-of-business-travelers-news14693
+- https://www.ere.net/articles/face-value-business-travel-surges-as-virtual-meeting-fatigue-sets-in
+- https://www.travelpress.com/study-finds-business-travellers-facing-stress-well-being-challenges/
 
 ---
 
