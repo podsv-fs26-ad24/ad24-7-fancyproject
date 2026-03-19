@@ -111,18 +111,17 @@ different perspectives on business travel and CO₂ management within the compan
 ![](pics/persona_anna_meier.png){ width=70% }
 
 ### Sources
-### Sources and References
 
-#### (Daniel Schmid)
-* **Sustainability Management in Companies: From Idea to Practice** [https://fis.leuphana.de/de/publications/nachhaltigkeitsmanagement-in-unternehmen-von-der-idee-zur-praxis-/](https://fis.leuphana.de/de/publications/nachhaltigkeitsmanagement-in-unternehmen-von-der-idee-zur-praxis-/)
-* **Sustainable Mobility and Management Series 38** [https://www.hs-koblenz.de/fileadmin/media/fb_wirtschaftswissenschaften/Forschung_Projekte/Publikationen/Schriftenreihe_38_Schueller_Mengen.pdf](https://www.hs-koblenz.de/fileadmin/media/fb_wirtschaftswissenschaften/Forschung_Projekte/Publikationen/Schriftenreihe_38_Schueller_Mengen.pdf)
-* **The Greenhouse Gas Protocol: A Corporate Accounting and Reporting Standard** [https://ghgprotocol.org/sites/default/files/standards/ghg-protocol-revised.pdf](https://ghgprotocol.org/sites/default/files/standards/ghg-protocol-revised.pdf)
-* **McKinsey Global Energy Perspective: Our Insights** [https://www.mckinsey.com/industries/energy-and-materials/our-insights/global-energy-perspective](https://www.mckinsey.com/industries/energy-and-materials/our-insights/global-energy-perspective)
+#### Daniel Schmid
+- [Sustainability Management in Companies: From Idea to Practice](https://fis.leuphana.de/de/publications/nachhaltigkeitsmanagement-in-unternehmen-von-der-idee-zur-praxis-/)
+- [Sustainable Mobility and Management Series 38](https://www.hs-koblenz.de/fileadmin/media/fb_wirtschaftswissenschaften/Forschung_Projekte/Publikationen/Schriftenreihe_38_Schueller_Mengen.pdf)
+- [The Greenhouse Gas Protocol: A Corporate Accounting and Reporting Standard](https://ghgprotocol.org/sites/default/files/standards/ghg-protocol-revised.pdf)
+- [McKinsey Global Energy Perspective: Our Insights](https://www.mckinsey.com/industries/energy-and-materials/our-insights/global-energy-perspective)
 
-#### (Anna Meier)
-* **Survey: The Preferences of Modern Business Travelers** [https://www.tourism-review.com/survey-shows-the-preferences-of-business-travelers-news14693](https://www.tourism-review.com/survey-shows-the-preferences-of-business-travelers-news14693)
-* **Face Value: Why Business Travel Surges Amid Virtual Meeting Fatigue** [https://www.ere.net/articles/face-value-business-travel-surges-as-virtual-meeting-fatigue-sets-in](https://www.ere.net/articles/face-value-business-travel-surges-as-virtual-meeting-fatigue-sets-in)
-* **Study: Business Travellers Facing Stress and Well-being Challenges** [https://www.travelpress.com/study-finds-business-travellers-facing-stress-well-being-challenges/](https://www.travelpress.com/study-finds-business-travellers-facing-stress-well-being-challenges/)
+#### Anna Meier
+- [Survey: The Preferences of Modern Business Travelers](https://www.tourism-review.com/survey-shows-the-preferences-of-business-travelers-news14693)
+- [Face Value: Why Business Travel Surges Amid Virtual Meeting Fatigue](https://www.ere.net/articles/face-value-business-travel-surges-as-virtual-meeting-fatigue-sets-in)
+- [Study: Business Travellers Facing Stress and Well-being Challenges](https://www.travelpress.com/study-finds-business-travellers-facing-stress-well-being-challenges/)
 
 ---
 
