@@ -95,10 +95,8 @@ Specifically, the dashboard enables stakeholders to answer three core questions:
 | **Role** | Senior decision-makers with overall responsibility for the company's strategic direction, including sustainability commitments and cost targets. Management sets the overarching CO₂ reduction goals and travel budget thresholds, and is accountable to external stakeholders such as investors, regulators, or board members. They do not engage with individual trip data or operational details. Their view is exclusively top-down. |
 | **Goal** | Get a fast, reliable overview of whether the company is on track to meet its sustainability and cost targets and have a data-driven basis to initiate strategic corrections if needed. |
 | **Dashboard interest** | **High.** Management needs a clean summary view. Current CO₂ budget consumption, overall spend, and trend direction. The transport mode comparison feature is particularly relevant here, as it supports strategic decisions like introducing mandatory rail travel policies below a certain distance threshold. Detailed filters or raw data views are not relevant for this group. They need clear indicators, not analysis tools. |
-
-![](pics/stakeholder_map.png){ width=70% }
-
 ---
+![Stakeholder Map](pics/stakeholder_map.png){ width=70% }
 
 ## User Analysis
 
