@@ -6,11 +6,53 @@ The project scope involves developing a functional dashboard prototype that inte
 
 
 ## Project Objectives and Success Criteria
-Describe the objectives **from the client/stakeholder perspective**. For example: "Enable users to understand the distribution of sales across different regions". Try to be as specific as possible, but restrict to the concrete needs formulated by the client/stakeholders. For example: if a dashboard is needed explicitly, then state it here, otherwise leave the form of the visualization product open.
+The primary objective of this project is to deliver the "Carbon Gatekeeper" Dashboard, a functional prototype that moves the organization from retrospective reporting to active, point-of-planning travel management. 
 
-Formulate success criteria (from the client/stakeholder perspective): qualitative objectives and, wherever possible, corresponding quantitative metrics with target values to be achieved within the project. These objectives should directly address the pains and gains identified in the user analysis.
+Specifically, the dashboard enables stakeholders to answer three core questions: 
 
-It is also helpful to specify what is explicitly excluded from the project objectives (out of scope).
+    Budget Status: "What is the current CO₂ budget status for my business unit?" (comparing actual emissions to yearly co2_budget_t using a Low/Medium/High gauge system). 
+
+    Impact Comparison: "What is the CO₂ difference between flight routes and alternative transport modes?" (quantifying the "avoidable CO₂" for routes where train_alternative_available is TRUE). 
+
+    Actionable Guidance: "Based on our remaining budget, which transport mode is the recommended choice for a specific trip?" Providing tailored recommendations like "MUST TAKE TRAIN" or "TRAVEL RESTRICTED". 
+
+ 
+
+ 
+
+Success Criteria 
+
+Qualitative Objectives: 
+
+    Actionability: The tool transforms complex data into a rule-based system for travel recommendations, aiding informed decision-making. 
+
+    Transparency: The dashboard provides a clear, hierarchical view of emissions, allowing users to distinguish between Business Units (BU1–4). 
+
+    Accessibility: Stakeholders can access the tool directly through a web browser via a Streamlit and GitHub Pages deployment without needing additional software. 
+
+ 
+
+Quantitative Metrics: 
+
+    Data Accuracy: 100% of calculations must utilize the CO2 metric to ensure high-fidelity environmental impact reporting. 
+
+    Feature Integration: The prototype must successfully integrate three core components. The Budget Monitor (Gauge), the Potential Analysis (Modal Shift), and the Trip Evaluation Tool into a single interface. 
+
+    Filter Functionality: The dashboard must allow users to filter data by transport mode, and organizational departments. 
+
+    Recommendation Logic: The simulator must accurately trigger "RESTRICTED" status when a department exceeds 100% of its assigned budget. 
+
+ 
+
+Out of Scope 
+
+    Predictive Analytics: Forecasting future travel demand or long-term CO₂ trajectories. 
+
+    Full Footprint Accounting: Inclusion of emissions outside of business travel (e.g., office energy or supply chain) 
+
+    External Integration: Real-time synchronization with live booking systems or HR databases. 
+
+    Automated Enforcement: The tool provides recommendations and status alerts but does not physically block external booking transactions. 
 
 ## Stakeholder Analysis
 List the people involved in and affected by the project. Describe their goals and relationships with each other. Visualisation in the form of a stakeholder map can provide a quick overview.
