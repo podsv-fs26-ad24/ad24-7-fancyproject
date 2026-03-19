@@ -54,7 +54,7 @@ Specifically, the dashboard enables stakeholders to answer three core questions:
 
 ## 1.3 Stakeholder Analysis
 
-### 🌱 Sustainability Manager
+### Sustainability Manager
 > *"Numbers don't lie, neither does our planet"*
 
 | | |
@@ -65,7 +65,7 @@ Specifically, the dashboard enables stakeholders to answer three core questions:
 
 ---
 
-### ✈️ Travel Manager
+### Travel Manager
 > *"Every trip planned, every policy enforced"*
 
 | | |
@@ -76,7 +76,7 @@ Specifically, the dashboard enables stakeholders to answer three core questions:
 
 ---
 
-### 💰 Finance / Controlling
+### Finance / Controlling
 > *"No budget, no ticket"*
 
 | | |
@@ -87,7 +87,7 @@ Specifically, the dashboard enables stakeholders to answer three core questions:
 
 ---
 
-### 🏢 Management / Corporate
+### Management / Corporate
 > *"Big picture, no noise"*
 
 | | |
