@@ -157,7 +157,9 @@ REQUIRED_INPUT = [
 
 @st.cache_data(show_spinner=False)
 def load_workbook(file_bytes: bytes) -> dict:
-    return pd.read_excel(BytesIO(file_bytes), sheet_name=None)
+    buf = BytesIO(file_bytes)
+    buf.seek(0)
+    return pd.read_excel(buf, sheet_name=None)
 
 
 def parse_budgets(df: pd.DataFrame) -> dict:
@@ -500,435 +502,436 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
+
 if hist_file is None:
     st.info(
         "Please upload the **historical reference Excel** in the sidebar to begin. "
         "Optionally, also upload a **planned trips file** to analyse upcoming travel; "
         "without it the dashboard analyses the historical data itself."
     )
-    st.stop()
-
-# Load
-hist_book = load_workbook(hist_file.getvalue())
-if "travel_data" not in hist_book:
-    st.error("Sheet 'travel_data' not found in the historical file.")
-    st.stop()
-
-hist = hist_book["travel_data"].copy()
-missing = [c for c in REQUIRED_HIST if c not in hist.columns]
-if missing:
-    st.error(f"Historical file is missing columns: {missing}")
-    st.stop()
-if co2_metric not in hist.columns:
-    st.error(f"CO2 column '{co2_metric}' not found in historical data.")
-    st.stop()
-
-hist["date"] = pd.to_datetime(hist["date"], errors="coerce")
-budgets = parse_budgets(hist_book.get("budget_2026"))
-ravg = route_averages(hist, co2_metric)
-
-# Decide source
-if input_file is not None:
-    inp_book = load_workbook(input_file.getvalue())
-    sheet_name = next(
-        (s for s in ["planned_trips", "travel_data"] if s in inp_book),
-        list(inp_book.keys())[0],
-    )
-    inp = inp_book[sheet_name].copy()
-    miss_in = [c for c in REQUIRED_INPUT if c not in inp.columns]
-    if miss_in:
-        st.error(f"Input file is missing required columns: {miss_in}")
-        st.stop()
-    if "date" in inp.columns:
-        inp["date"] = pd.to_datetime(inp["date"], errors="coerce")
-    src_label = f"Planned trips file ({input_file.name})"
-    n_input = len(inp)
 else:
-    inp = hist.copy()
-    src_label = "Historical data (no planned trips uploaded)"
-    n_input = len(inp)
-
-estimated_original = enrich_input(inp, ravg, co2_metric)
-
-# ---------------------------------------------------------------------------
-# Scenario state - "as_planned" (default) or "optimised" (alternatives applied)
-# ---------------------------------------------------------------------------
-if "scenario" not in st.session_state:
-    st.session_state.scenario = "as_planned"
-
-# Compute alternatives on the ORIGINAL plan so we can both display them
-# and optionally apply them.
-alts_original = find_alternatives(estimated_original, ravg)
-saving_potential = float(alts_original["saving_t"].sum()) if not alts_original.empty else 0.0
-
-# Active scenario data
-if st.session_state.scenario == "optimised":
-    estimated = apply_alternatives(estimated_original, alts_original)
-    alts = pd.DataFrame()  # already applied -> no remaining levers
-else:
-    estimated = estimated_original
-    alts = alts_original
-
-# Period info
-if "date" in estimated.columns and estimated["date"].notna().any():
-    d_min = estimated["date"].min()
-    d_max = estimated["date"].max()
-    period = f"{d_min:%Y-%m-%d} to {d_max:%Y-%m-%d}"
-else:
-    period = "unspecified"
-
-# Scenario indicator strip (above metadata strip)
-if st.session_state.scenario == "optimised":
-    n_shifted = int(estimated["mode_shifted"].sum()) if "mode_shifted" in estimated.columns else 0
-    sc_col1, sc_col2 = st.columns([4, 1])
-    with sc_col1:
-        st.markdown(
-            f"<div class='headline-ok' style='margin-bottom:0.6rem'>"
-            f"<b>Optimised scenario active</b> &middot; {n_shifted} flight(s) shifted to a "
-            f"lower-CO2 mode &middot; saved {saving_potential:,.1f} t CO2 vs. as-planned."
-            f"</div>",
-            unsafe_allow_html=True,
-        )
-    with sc_col2:
-        if st.button("Reset to as-planned", use_container_width=True, key="reset_scenario"):
-            st.session_state.scenario = "as_planned"
-            st.rerun()
-
-# Metadata strip (lecture guideline #19: state your metadata)
-n_unmatched = int(estimated["estimated_co2"].isna().sum())
-match_note = "" if n_unmatched == 0 else f" - {n_unmatched} trip(s) without route match"
-scenario_label = "as planned" if st.session_state.scenario == "as_planned" else "optimised (mode shift applied)"
-st.markdown(
-    f"<div class='meta-strip'>"
-    f"<span><b>Source</b> {src_label}</span>"
-    f"<span><b>Period</b> {period}</span>"
-    f"<span><b>Trips</b> {n_input:,}</span>"
-    f"<span><b>Scenario</b> {scenario_label}</span>"
-    f"<span><b>Reference</b> {hist_file.name} ({len(hist):,} historical trips)</span>"
-    f"<span><b>Method</b> route x mode average{match_note}</span>"
-    f"</div>",
-    unsafe_allow_html=True,
-)
-
-# ---------------------------------------------------------------------------
-# Section 1: Overview KPIs (guideline #4: carefully chose KPIs, #16: information not data)
-# ---------------------------------------------------------------------------
-total_co2 = float(estimated["estimated_co2"].sum())
-total_budget = sum(budgets.values()) if budgets else 0
-n_trips = len(estimated)
-
-st.markdown("<div class='section-title'>Overview</div>", unsafe_allow_html=True)
-
-kc = st.columns(4)
-
-with kc[0]:
-    if total_budget > 0:
-        delta_t = total_co2 - total_budget
-        delta_pct = delta_t / total_budget * 100
-        if delta_t > 0:
-            delta_html = f"<span class='kpi-delta-bad'>+{delta_t:,.1f} t over budget ({delta_pct:+.0f}%)</span>"
+    # ------------------------------------------------------------------
+    # Load historical workbook
+    # ------------------------------------------------------------------
+    hist_book = load_workbook(hist_file.getvalue())
+    if "travel_data" not in hist_book:
+        st.error("Sheet 'travel_data' not found in the historical file.")
+    else:
+        hist = hist_book["travel_data"].copy()
+        missing = [c for c in REQUIRED_HIST if c not in hist.columns]
+        if missing:
+            st.error(f"Historical file is missing columns: {missing}")
+        elif co2_metric not in hist.columns:
+            st.error(f"CO2 column '{co2_metric}' not found in historical data.")
         else:
-            delta_html = f"<span class='kpi-delta-ok'>{delta_t:,.1f} t under budget ({delta_pct:+.0f}%)</span>"
-    else:
-        delta_html = "<span class='kpi-delta-neutral'>no budget loaded</span>"
-    st.markdown(
-        f"<div class='kpi-card'>"
-        f"<div class='kpi-label'>Total CO2 emissions</div>"
-        f"<div class='kpi-value'>{total_co2:,.1f} t</div>"
-        f"{delta_html}"
-        f"</div>",
-        unsafe_allow_html=True,
-    )
+            hist["date"] = pd.to_datetime(hist["date"], errors="coerce")
+            budgets = parse_budgets(hist_book.get("budget_2026"))
+            ravg = route_averages(hist, co2_metric)
 
-with kc[1]:
-    compliance = (total_co2 / total_budget * 100) if total_budget > 0 else 0
-    if compliance > 100:
-        comp_class = "kpi-delta-bad"
-    elif compliance > 85:
-        comp_class = "kpi-delta-neutral"
-    else:
-        comp_class = "kpi-delta-ok"
-    st.markdown(
-        f"<div class='kpi-card'>"
-        f"<div class='kpi-label'>Budget utilisation</div>"
-        f"<div class='kpi-value'>{compliance:.0f}%</div>"
-        f"<span class='{comp_class}'>of {total_budget:,.0f} t allocated</span>"
-        f"</div>",
-        unsafe_allow_html=True,
-    )
+            # ------------------------------------------------------------------
+            # Decide source: planned trips file or fall back to historical
+            # ------------------------------------------------------------------
+            _inp_error = None
+            if input_file is not None:
+                inp_book = load_workbook(input_file.getvalue())
+                sheet_name = next(
+                    (s for s in ["planned_trips", "travel_data"] if s in inp_book),
+                    list(inp_book.keys())[0],
+                )
+                inp = inp_book[sheet_name].copy()
+                miss_in = [c for c in REQUIRED_INPUT if c not in inp.columns]
+                if miss_in:
+                    _inp_error = f"Input file is missing required columns: {miss_in}"
+                else:
+                    if "date" in inp.columns:
+                        inp["date"] = pd.to_datetime(inp["date"], errors="coerce")
+                    src_label = f"Planned trips file ({input_file.name})"
+                    n_input = len(inp)
+            else:
+                inp = hist.copy()
+                src_label = "Historical data (no planned trips uploaded)"
+                n_input = len(inp)
 
-with kc[2]:
-    if st.session_state.scenario == "optimised":
-        pct_save = (saving_potential / (total_co2 + saving_potential) * 100) if (total_co2 + saving_potential) > 0 else 0
-        st.markdown(
-            f"<div class='kpi-card'>"
-            f"<div class='kpi-label'>CO2 saved by mode shift</div>"
-            f"<div class='kpi-value' style='color:{COLOR['ok']}'>-{saving_potential:,.1f} t</div>"
-            f"<span class='kpi-delta-ok'>{pct_save:.0f}% lower than as-planned</span>"
-            f"</div>",
-            unsafe_allow_html=True,
-        )
-    else:
-        pct_save = (saving_potential / total_co2 * 100) if total_co2 > 0 else 0
-        st.markdown(
-            f"<div class='kpi-card'>"
-            f"<div class='kpi-label'>Reduction potential</div>"
-            f"<div class='kpi-value'>{saving_potential:,.1f} t</div>"
-            f"<span class='kpi-delta-ok'>via mode shift ({pct_save:.0f}% of total)</span>"
-            f"</div>",
-            unsafe_allow_html=True,
-        )
+            if _inp_error:
+                st.error(_inp_error)
+            else:
+                estimated_original = enrich_input(inp, ravg, co2_metric)
 
-with kc[3]:
-    avg_per_trip = (total_co2 / n_trips * 1000) if n_trips else 0
-    st.markdown(
-        f"<div class='kpi-card'>"
-        f"<div class='kpi-label'>Trips analysed</div>"
-        f"<div class='kpi-value'>{n_trips:,}</div>"
-        f"<span class='kpi-delta-neutral'>avg {avg_per_trip:,.0f} kg / trip</span>"
-        f"</div>",
-        unsafe_allow_html=True,
-    )
+                # ------------------------------------------------------------------
+                # Scenario state
+                # ------------------------------------------------------------------
+                if "scenario" not in st.session_state:
+                    st.session_state.scenario = "as_planned"
 
-# Headline (guideline #16: information, not data)
-if total_budget > 0:
-    if total_co2 > total_budget:
-        st.markdown(
-            f"<div class='headline-bad' style='margin-top:1rem'>"
-            f"Total emissions exceed the combined CO2 budget by "
-            f"<b>{total_co2 - total_budget:,.1f} t</b> ({(total_co2/total_budget-1)*100:+.0f}%). "
-            f"See the BU breakdown below to identify where to act."
-            f"</div>",
-            unsafe_allow_html=True,
-        )
-    elif total_co2 > 0.85 * total_budget:
-        st.markdown(
-            f"<div class='headline-warn' style='margin-top:1rem'>"
-            f"Emissions are within budget but approaching the limit "
-            f"({(total_co2/total_budget)*100:.0f}% utilised)."
-            f"</div>",
-            unsafe_allow_html=True,
-        )
-    else:
-        st.markdown(
-            f"<div class='headline-ok' style='margin-top:1rem'>"
-            f"Emissions are well within the combined CO2 budget "
-            f"({(total_co2/total_budget)*100:.0f}% utilised)."
-            f"</div>",
-            unsafe_allow_html=True,
-        )
+                alts_original = find_alternatives(estimated_original, ravg)
+                saving_potential = float(alts_original["saving_t"].sum()) if not alts_original.empty else 0.0
 
-# ---------------------------------------------------------------------------
-# Section 2: BU performance (guideline #11: group by attribute, #10: symmetric)
-# ---------------------------------------------------------------------------
-st.markdown("<div class='section-title'>Budget compliance by Business Unit</div>", unsafe_allow_html=True)
-st.markdown(
-    "<div class='section-hint'>Status gauges and ranking, side by side. "
-    "Line on each gauge marks the BU's annual budget.</div>",
-    unsafe_allow_html=True,
-)
+                if st.session_state.scenario == "optimised":
+                    estimated = apply_alternatives(estimated_original, alts_original)
+                    alts = pd.DataFrame()
+                else:
+                    estimated = estimated_original
+                    alts = alts_original
 
-bu_emissions = estimated.groupby("business_unit")["estimated_co2"].sum().to_dict()
-bus_present = sorted(set(bu_emissions.keys()) | set(budgets.keys()))
+                # Period info
+                if "date" in estimated.columns and estimated["date"].notna().any():
+                    d_min = estimated["date"].min()
+                    d_max = estimated["date"].max()
+                    period = f"{d_min:%Y-%m-%d} to {d_max:%Y-%m-%d}"
+                else:
+                    period = "unspecified"
 
-left, right = st.columns([3, 2])
+                # Scenario indicator strip
+                if st.session_state.scenario == "optimised":
+                    n_shifted = int(estimated["mode_shifted"].sum()) if "mode_shifted" in estimated.columns else 0
+                    sc_col1, sc_col2 = st.columns([4, 1])
+                    with sc_col1:
+                        st.markdown(
+                            f"<div class='headline-ok' style='margin-bottom:0.6rem'>"
+                            f"<b>Optimised scenario active</b> &middot; {n_shifted} flight(s) shifted to a "
+                            f"lower-CO2 mode &middot; saved {saving_potential:,.1f} t CO2 vs. as-planned."
+                            f"</div>",
+                            unsafe_allow_html=True,
+                        )
+                    with sc_col2:
+                        if st.button("Reset to as-planned", use_container_width=True, key="reset_scenario"):
+                            st.session_state.scenario = "as_planned"
+                            st.rerun()
 
-with left:
-    # 2x2 symmetric gauge grid
-    if bus_present:
-        rows = [bus_present[i:i+2] for i in range(0, len(bus_present), 2)]
-        for row in rows:
-            cols = st.columns(2)
-            for col, bu in zip(cols, row):
-                col.plotly_chart(
-                    gauge(
-                        bu_emissions.get(bu, 0),
-                        budgets.get(bu, np.nan),
-                        bu, BU_COLOR.get(bu, COLOR["ink"]),
-                    ),
-                    use_container_width=True,
-                    config={"displayModeBar": False},
+                # Metadata strip
+                n_unmatched = int(estimated["estimated_co2"].isna().sum())
+                match_note = "" if n_unmatched == 0 else f" - {n_unmatched} trip(s) without route match"
+                scenario_label = "as planned" if st.session_state.scenario == "as_planned" else "optimised (mode shift applied)"
+                st.markdown(
+                    f"<div class='meta-strip'>"
+                    f"<span><b>Source</b> {src_label}</span>"
+                    f"<span><b>Period</b> {period}</span>"
+                    f"<span><b>Trips</b> {n_input:,}</span>"
+                    f"<span><b>Scenario</b> {scenario_label}</span>"
+                    f"<span><b>Reference</b> {hist_file.name} ({len(hist):,} historical trips)</span>"
+                    f"<span><b>Method</b> route x mode average{match_note}</span>"
+                    f"</div>",
+                    unsafe_allow_html=True,
                 )
 
-with right:
-    st.plotly_chart(
-        bar_bu_vs_budget(bu_emissions, budgets),
-        use_container_width=True,
-        config={"displayModeBar": False},
-    )
+                # ------------------------------------------------------------------
+                # Section 1: Overview KPIs
+                # ------------------------------------------------------------------
+                total_co2 = float(estimated["estimated_co2"].sum())
+                total_budget = sum(budgets.values()) if budgets else 0
+                n_trips = len(estimated)
 
-# Per-BU headlines
-hl_cols = st.columns(len(bus_present)) if bus_present else []
-for col, bu in zip(hl_cols, bus_present):
-    actual = bu_emissions.get(bu, 0)
-    bud = budgets.get(bu, np.nan)
-    if pd.isna(bud) or bud <= 0:
-        col.markdown(
-            f"<div class='headline-warn'><b>{bu}</b>: no budget set "
-            f"(actual {actual:.1f} t)</div>",
-            unsafe_allow_html=True,
-        )
-    elif actual > bud:
-        col.markdown(
-            f"<div class='headline-bad'><b>{bu}</b> over by "
-            f"{actual - bud:,.1f} t ({(actual/bud - 1)*100:+.0f}%)</div>",
-            unsafe_allow_html=True,
-        )
-    elif actual > 0.85 * bud:
-        col.markdown(
-            f"<div class='headline-warn'><b>{bu}</b> approaching limit "
-            f"({(actual/bud)*100:.0f}% used)</div>",
-            unsafe_allow_html=True,
-        )
-    else:
-        col.markdown(
-            f"<div class='headline-ok'><b>{bu}</b> on track "
-            f"({(actual/bud)*100:.0f}% used)</div>",
-            unsafe_allow_html=True,
-        )
+                st.markdown("<div class='section-title'>Overview</div>", unsafe_allow_html=True)
 
-# ---------------------------------------------------------------------------
-# Section 3: Geography
-# ---------------------------------------------------------------------------
-st.markdown("<div class='section-title'>Geographic distribution</div>", unsafe_allow_html=True)
-st.markdown(
-    "<div class='section-hint'>Line thickness scales with total CO2 on each route. "
-    "Colour encodes transport mode. Hover over a route for details.</div>",
-    unsafe_allow_html=True,
-)
+                kc = st.columns(4)
 
-map_left, _ = st.columns([1, 4])
-with map_left:
-    map_region = st.selectbox(
-        "Region", list(REGION_VIEWS.keys()), index=0,
-        label_visibility="collapsed", key="map_region",
-    )
+                with kc[0]:
+                    if total_budget > 0:
+                        delta_t = total_co2 - total_budget
+                        delta_pct = delta_t / total_budget * 100
+                        if delta_t > 0:
+                            delta_html = f"<span class='kpi-delta-bad'>+{delta_t:,.1f} t over budget ({delta_pct:+.0f}%)</span>"
+                        else:
+                            delta_html = f"<span class='kpi-delta-ok'>{delta_t:,.1f} t under budget ({delta_pct:+.0f}%)</span>"
+                    else:
+                        delta_html = "<span class='kpi-delta-neutral'>no budget loaded</span>"
+                    st.markdown(
+                        f"<div class='kpi-card'>"
+                        f"<div class='kpi-label'>Total CO2 emissions</div>"
+                        f"<div class='kpi-value'>{total_co2:,.1f} t</div>"
+                        f"{delta_html}"
+                        f"</div>",
+                        unsafe_allow_html=True,
+                    )
 
-route_summary = (
-    estimated.groupby(["departure_iata", "arrival_iata", "transport_mode"])
-    .agg(
-        total_co2=("estimated_co2", "sum"),
-        n_trips=("estimated_co2", "count"),
-        dep_lat=("departure_lat", "first"),
-        dep_lon=("departure_lon", "first"),
-        arr_lat=("arrival_lat", "first"),
-        arr_lon=("arrival_lon", "first"),
-    )
-    .reset_index()
-)
-st.plotly_chart(
-    world_map(route_summary, region=map_region),
-    use_container_width=True, config={"displayModeBar": False},
-)
+                with kc[1]:
+                    compliance = (total_co2 / total_budget * 100) if total_budget > 0 else 0
+                    if compliance > 100:
+                        comp_class = "kpi-delta-bad"
+                    elif compliance > 85:
+                        comp_class = "kpi-delta-neutral"
+                    else:
+                        comp_class = "kpi-delta-ok"
+                    st.markdown(
+                        f"<div class='kpi-card'>"
+                        f"<div class='kpi-label'>Budget utilisation</div>"
+                        f"<div class='kpi-value'>{compliance:.0f}%</div>"
+                        f"<span class='{comp_class}'>of {total_budget:,.0f} t allocated</span>"
+                        f"</div>",
+                        unsafe_allow_html=True,
+                    )
 
-# ---------------------------------------------------------------------------
-# Section 4: Reduction levers (the actionable section)
-# ---------------------------------------------------------------------------
-st.markdown("<div class='section-title'>Reduction levers</div>", unsafe_allow_html=True)
-st.markdown(
-    "<div class='section-hint'>For every flight in the input, the dashboard checks if a "
-    "lower-CO2 mode (train, bus, rental car) was historically used on the same route, "
-    "and lists the routes with the largest aggregate saving potential.</div>",
-    unsafe_allow_html=True,
-)
+                with kc[2]:
+                    if st.session_state.scenario == "optimised":
+                        pct_save = (saving_potential / (total_co2 + saving_potential) * 100) if (total_co2 + saving_potential) > 0 else 0
+                        st.markdown(
+                            f"<div class='kpi-card'>"
+                            f"<div class='kpi-label'>CO2 saved by mode shift</div>"
+                            f"<div class='kpi-value' style='color:{COLOR["ok"]}'>-{saving_potential:,.1f} t</div>"
+                            f"<span class='kpi-delta-ok'>{pct_save:.0f}% lower than as-planned</span>"
+                            f"</div>",
+                            unsafe_allow_html=True,
+                        )
+                    else:
+                        pct_save = (saving_potential / total_co2 * 100) if total_co2 > 0 else 0
+                        st.markdown(
+                            f"<div class='kpi-card'>"
+                            f"<div class='kpi-label'>Reduction potential</div>"
+                            f"<div class='kpi-value'>{saving_potential:,.1f} t</div>"
+                            f"<span class='kpi-delta-ok'>via mode shift ({pct_save:.0f}% of total)</span>"
+                            f"</div>",
+                            unsafe_allow_html=True,
+                        )
 
-if alts.empty:
-    st.markdown(
-        "<div class='headline-ok'>No greener alternatives found in the historical data "
-        "for the analysed flights.</div>",
-        unsafe_allow_html=True,
-    )
-else:
-    summary = (
-        alts.groupby(["departure_iata", "arrival_iata", "alt_mode"])
-        .agg(
-            n_flights=("saving_t", "count"),
-            avg_flight_co2=("estimated_co2", "mean"),
-            avg_alt_co2=("alt_co2", "mean"),
-            total_saving_t=("saving_t", "sum"),
-            avg_saving_pct=("saving_pct", "mean"),
-        )
-        .reset_index()
-        .sort_values("total_saving_t", ascending=False)
-        .rename(columns={
-            "departure_iata":  "From",
-            "arrival_iata":    "To",
-            "alt_mode":        "Alternative",
-            "n_flights":       "Flights",
-            "avg_flight_co2":  "Avg flight (t)",
-            "avg_alt_co2":     "Avg alt. (t)",
-            "total_saving_t":  "Saving (t)",
-            "avg_saving_pct":  "Saving %",
-        })
-    )
+                with kc[3]:
+                    avg_per_trip = (total_co2 / n_trips * 1000) if n_trips else 0
+                    st.markdown(
+                        f"<div class='kpi-card'>"
+                        f"<div class='kpi-label'>Trips analysed</div>"
+                        f"<div class='kpi-value'>{n_trips:,}</div>"
+                        f"<span class='kpi-delta-neutral'>avg {avg_per_trip:,.0f} kg / trip</span>"
+                        f"</div>",
+                        unsafe_allow_html=True,
+                    )
 
-    sav_col1, sav_col2 = st.columns([1, 2])
-    with sav_col1:
-        st.markdown(
-            f"<div class='kpi-card'>"
-            f"<div class='kpi-label'>Total saving potential</div>"
-            f"<div class='kpi-value' style='color:{COLOR['ok']}'>{saving_potential:,.1f} t</div>"
-            f"<span class='kpi-delta-neutral'>across {summary.shape[0]} route(s)</span>"
-            f"</div>",
-            unsafe_allow_html=True,
-        )
-    with sav_col2:
-        st.dataframe(
-            summary.head(15).style.format({
-                "Avg flight (t)": "{:.3f}",
-                "Avg alt. (t)":   "{:.3f}",
-                "Saving (t)":     "{:.2f}",
-                "Saving %":       "{:.1f}%",
-            }),
-            use_container_width=True, hide_index=True,
-        )
+                # Headline
+                if total_budget > 0:
+                    if total_co2 > total_budget:
+                        st.markdown(
+                            f"<div class='headline-bad' style='margin-top:1rem'>"
+                            f"Total emissions exceed the combined CO2 budget by "
+                            f"<b>{total_co2 - total_budget:,.1f} t</b> ({(total_co2/total_budget-1)*100:+.0f}%). "
+                            f"See the BU breakdown below to identify where to act."
+                            f"</div>",
+                            unsafe_allow_html=True,
+                        )
+                    elif total_co2 > 0.85 * total_budget:
+                        st.markdown(
+                            f"<div class='headline-warn' style='margin-top:1rem'>"
+                            f"Emissions are within budget but approaching the limit "
+                            f"({(total_co2/total_budget)*100:.0f}% utilised)."
+                            f"</div>",
+                            unsafe_allow_html=True,
+                        )
+                    else:
+                        st.markdown(
+                            f"<div class='headline-ok' style='margin-top:1rem'>"
+                            f"Emissions are well within the combined CO2 budget "
+                            f"({(total_co2/total_budget)*100:.0f}% utilised)."
+                            f"</div>",
+                            unsafe_allow_html=True,
+                        )
 
-    # Action button: apply the alternatives and recompute the dashboard
-    btn_col1, btn_col2 = st.columns([1, 3])
-    with btn_col1:
-        if st.button(
-            "Apply alternatives",
-            type="primary", use_container_width=True, key="apply_alts",
-            help="Replace each flight that has a greener alternative with that "
-                 "alternative, then recompute the dashboard against the budget.",
-        ):
-            st.session_state.scenario = "optimised"
-            st.rerun()
-    with btn_col2:
-        st.markdown(
-            f"<div class='section-hint' style='margin-top:0.6rem'>"
-            f"Applies the {len(alts):,} suggested mode shifts above. "
-            f"Gauges, banner and KPIs will recompute against the same budgets."
-            f"</div>",
-            unsafe_allow_html=True,
-        )
+                # ------------------------------------------------------------------
+                # Section 2: BU performance
+                # ------------------------------------------------------------------
+                st.markdown("<div class='section-title'>Budget compliance by Business Unit</div>", unsafe_allow_html=True)
+                st.markdown(
+                    "<div class='section-hint'>Status gauges and ranking, side by side. "
+                    "Line on each gauge marks the BU's annual budget.</div>",
+                    unsafe_allow_html=True,
+                )
 
-# ---------------------------------------------------------------------------
-# Section 5: Detail (collapsed - manage complexity, guideline #9)
-# ---------------------------------------------------------------------------
-with st.expander("Detail data and export"):
-    cols = [
-        c for c in [
-            "date", "business_unit", "person_type", "transport_mode",
-            "departure_iata", "arrival_iata", "km", "estimated_co2",
-            "cost_CHF", "travel_purpose",
-        ] if c in estimated.columns
-    ]
-    st.dataframe(
-        estimated[cols].head(2000),
-        use_container_width=True, hide_index=True,
-    )
-    st.caption(f"Showing first 2000 of {len(estimated):,} rows.")
+                bu_emissions = estimated.groupby("business_unit")["estimated_co2"].sum().to_dict()
+                bus_present = sorted(set(bu_emissions.keys()) | set(budgets.keys()))
 
-    buf = BytesIO()
-    with pd.ExcelWriter(buf, engine="openpyxl") as w:
-        estimated.to_excel(w, sheet_name="estimated", index=False)
-        route_summary.to_excel(w, sheet_name="routes", index=False)
-        if not alts.empty:
-            summary.to_excel(w, sheet_name="alternatives", index=False)
-    st.download_button(
-        "Download analysis as Excel",
-        data=buf.getvalue(),
-        file_name="co2_dashboard_export.xlsx",
-        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-    )
+                left, right = st.columns([3, 2])
+
+                with left:
+                    if bus_present:
+                        rows = [bus_present[i:i+2] for i in range(0, len(bus_present), 2)]
+                        for row in rows:
+                            cols = st.columns(2)
+                            for col, bu in zip(cols, row):
+                                col.plotly_chart(
+                                    gauge(
+                                        bu_emissions.get(bu, 0),
+                                        budgets.get(bu, np.nan),
+                                        bu, BU_COLOR.get(bu, COLOR["ink"]),
+                                    ),
+                                    use_container_width=True,
+                                    config={"displayModeBar": False},
+                                )
+
+                with right:
+                    st.plotly_chart(
+                        bar_bu_vs_budget(bu_emissions, budgets),
+                        use_container_width=True,
+                        config={"displayModeBar": False},
+                    )
+
+                # Per-BU headlines
+                hl_cols = st.columns(len(bus_present)) if bus_present else []
+                for col, bu in zip(hl_cols, bus_present):
+                    actual = bu_emissions.get(bu, 0)
+                    bud = budgets.get(bu, np.nan)
+                    if pd.isna(bud) or bud <= 0:
+                        col.markdown(
+                            f"<div class='headline-warn'><b>{bu}</b>: no budget set "
+                            f"(actual {actual:.1f} t)</div>",
+                            unsafe_allow_html=True,
+                        )
+                    elif actual > bud:
+                        col.markdown(
+                            f"<div class='headline-bad'><b>{bu}</b> over by "
+                            f"{actual - bud:,.1f} t ({(actual/bud - 1)*100:+.0f}%)</div>",
+                            unsafe_allow_html=True,
+                        )
+                    elif actual > 0.85 * bud:
+                        col.markdown(
+                            f"<div class='headline-warn'><b>{bu}</b> approaching limit "
+                            f"({(actual/bud)*100:.0f}% used)</div>",
+                            unsafe_allow_html=True,
+                        )
+                    else:
+                        col.markdown(
+                            f"<div class='headline-ok'><b>{bu}</b> on track "
+                            f"({(actual/bud)*100:.0f}% used)</div>",
+                            unsafe_allow_html=True,
+                        )
+
+                # ------------------------------------------------------------------
+                # Section 3: Geography
+                # ------------------------------------------------------------------
+                st.markdown("<div class='section-title'>Geographic distribution</div>", unsafe_allow_html=True)
+                st.markdown(
+                    "<div class='section-hint'>Line thickness scales with total CO2 on each route. "
+                    "Colour encodes transport mode. Hover over a route for details.</div>",
+                    unsafe_allow_html=True,
+                )
+
+                map_left, _ = st.columns([1, 4])
+                with map_left:
+                    map_region = st.selectbox(
+                        "Region", list(REGION_VIEWS.keys()), index=0,
+                        label_visibility="collapsed", key="map_region",
+                    )
+
+                route_summary = (
+                    estimated.groupby(["departure_iata", "arrival_iata", "transport_mode"])
+                    .agg(
+                        total_co2=("estimated_co2", "sum"),
+                        n_trips=("estimated_co2", "count"),
+                        dep_lat=("departure_lat", "first"),
+                        dep_lon=("departure_lon", "first"),
+                        arr_lat=("arrival_lat", "first"),
+                        arr_lon=("arrival_lon", "first"),
+                    )
+                    .reset_index()
+                )
+                st.plotly_chart(
+                    world_map(route_summary, region=map_region),
+                    use_container_width=True, config={"displayModeBar": False},
+                )
+
+                # ------------------------------------------------------------------
+                # Section 4: Reduction levers
+                # ------------------------------------------------------------------
+                st.markdown("<div class='section-title'>Reduction levers</div>", unsafe_allow_html=True)
+                st.markdown(
+                    "<div class='section-hint'>For every flight in the input, the dashboard checks if a "
+                    "lower-CO2 mode (train, bus, rental car) was historically used on the same route, "
+                    "and lists the routes with the largest aggregate saving potential.</div>",
+                    unsafe_allow_html=True,
+                )
+
+                if alts.empty:
+                    st.markdown(
+                        "<div class='headline-ok'>No greener alternatives found in the historical data "
+                        "for the analysed flights.</div>",
+                        unsafe_allow_html=True,
+                    )
+                else:
+                    summary = (
+                        alts.groupby(["departure_iata", "arrival_iata", "alt_mode"])
+                        .agg(
+                            n_flights=("saving_t", "count"),
+                            avg_flight_co2=("estimated_co2", "mean"),
+                            avg_alt_co2=("alt_co2", "mean"),
+                            total_saving_t=("saving_t", "sum"),
+                            avg_saving_pct=("saving_pct", "mean"),
+                        )
+                        .reset_index()
+                        .sort_values("total_saving_t", ascending=False)
+                        .rename(columns={
+                            "departure_iata":  "From",
+                            "arrival_iata":    "To",
+                            "alt_mode":        "Alternative",
+                            "n_flights":       "Flights",
+                            "avg_flight_co2":  "Avg flight (t)",
+                            "avg_alt_co2":     "Avg alt. (t)",
+                            "total_saving_t":  "Saving (t)",
+                            "avg_saving_pct":  "Saving %",
+                        })
+                    )
+
+                    sav_col1, sav_col2 = st.columns([1, 2])
+                    with sav_col1:
+                        st.markdown(
+                            f"<div class='kpi-card'>"
+                            f"<div class='kpi-label'>Total saving potential</div>"
+                            f"<div class='kpi-value' style='color:{COLOR["ok"]}'>{saving_potential:,.1f} t</div>"
+                            f"<span class='kpi-delta-neutral'>across {summary.shape[0]} route(s)</span>"
+                            f"</div>",
+                            unsafe_allow_html=True,
+                        )
+                    with sav_col2:
+                        st.dataframe(
+                            summary.head(15).style.format({
+                                "Avg flight (t)": "{:.3f}",
+                                "Avg alt. (t)":   "{:.3f}",
+                                "Saving (t)":     "{:.2f}",
+                                "Saving %":       "{:.1f}%",
+                            }),
+                            use_container_width=True, hide_index=True,
+                        )
+
+                    btn_col1, btn_col2 = st.columns([1, 3])
+                    with btn_col1:
+                        if st.button(
+                            "Apply alternatives",
+                            type="primary", use_container_width=True, key="apply_alts",
+                            help="Replace each flight that has a greener alternative with that "
+                                 "alternative, then recompute the dashboard against the budget.",
+                        ):
+                            st.session_state.scenario = "optimised"
+                            st.rerun()
+                    with btn_col2:
+                        st.markdown(
+                            f"<div class='section-hint' style='margin-top:0.6rem'>"
+                            f"Applies the {len(alts):,} suggested mode shifts above. "
+                            f"Gauges, banner and KPIs will recompute against the same budgets."
+                            f"</div>",
+                            unsafe_allow_html=True,
+                        )
+
+                # ------------------------------------------------------------------
+                # Section 5: Detail (collapsed)
+                # ------------------------------------------------------------------
+                with st.expander("Detail data and export"):
+                    cols = [
+                        c for c in [
+                            "date", "business_unit", "person_type", "transport_mode",
+                            "departure_iata", "arrival_iata", "km", "estimated_co2",
+                            "cost_CHF", "travel_purpose",
+                        ] if c in estimated.columns
+                    ]
+                    st.dataframe(
+                        estimated[cols].head(2000),
+                        use_container_width=True, hide_index=True,
+                    )
+                    st.caption(f"Showing first 2000 of {len(estimated):,} rows.")
+
+                    buf = BytesIO()
+                    with pd.ExcelWriter(buf, engine="openpyxl") as w:
+                        estimated.to_excel(w, sheet_name="estimated", index=False)
+                        route_summary.to_excel(w, sheet_name="routes", index=False)
+                        if not alts.empty:
+                            summary.to_excel(w, sheet_name="alternatives", index=False)
+                    buf.seek(0)
+                    st.download_button(
+                        "Download analysis as Excel",
+                        data=buf.getvalue(),
+                        file_name="co2_dashboard_export.xlsx",
+                        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                    )
